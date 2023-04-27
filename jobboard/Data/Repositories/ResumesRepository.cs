@@ -11,9 +11,12 @@ namespace jobboard.Data.Repositories
         Task<IReadOnlyList<Resume>> GetResumesAsync();
         Task<IReadOnlyList<Resume>> GetUserResumesAsync(string userId);
         Task<Resume?> GetResumeAsync(int resumeId);
-        Task CreateResumeAsync(CreateResumeCommand createResumeDto, string userId);
+        Task CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user);
         Task DeleteResumeAsync(Resume resume);
         Task UpdateResumeAsync(Resume resume);
+        Task DeleteResumeExperienceAsync(Experience experience);
+        Task DeleteResumeEducationAsync(Education education);
+         Task DeleteResumeSkillAsync(Skills skill);
     }
 
     public class ResumesRepository : IResumesRepository
@@ -62,7 +65,7 @@ namespace jobboard.Data.Repositories
 
 
         //##################
-        public async Task CreateResumeAsync(CreateResumeCommand createResumeDto, string userId)
+        public async Task CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user)
         {
             var resume = new Resume
             {
@@ -75,7 +78,7 @@ namespace jobboard.Data.Repositories
                 Summary = createResumeDto.Summary,
                 References = createResumeDto.References,
                 IsHidden = false,
-                YearOfBirth = DateTime.Now,
+                YearOfBirth = user.DateOfBirth,
                 UserId = userId
             };
 
@@ -139,6 +142,23 @@ namespace jobboard.Data.Repositories
         public async Task UpdateResumeAsync(Resume resume)
         {
             _db.Resumes.Update(resume);
+            await _db.SaveChangesAsync();
+        }
+
+
+        public async Task DeleteResumeSkillAsync(Skills skill)
+        {
+            _db.Skills.Remove(skill);
+            await _db.SaveChangesAsync();
+        }
+        public async Task DeleteResumeEducationAsync(Education education)
+        {
+            _db.Education.Remove(education);
+            await _db.SaveChangesAsync();
+        }
+        public async Task DeleteResumeExperienceAsync(Experience experience)
+        {
+            _db.Experiences.Remove(experience);
             await _db.SaveChangesAsync();
         }
         public async Task DeleteResumeAsync(Resume resume)

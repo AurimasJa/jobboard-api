@@ -236,4 +236,70 @@ public class JobsController : ControllerBase
             )
         );
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<SuccessfulLoginDto>> UpdateJob(int id, UpdateJobDto updateJobDto)
+    {
+        var job = await _jobsRepository.GetJobAsync(id);
+        if (job == null)
+            return NotFound($"Įvyko klaida");
+
+        job.Title = job.Title == updateJobDto.Title || String.IsNullOrEmpty(updateJobDto.Title) ? job.Title : updateJobDto.Title;
+        job.Description = job.Description == updateJobDto.Description || String.IsNullOrEmpty(updateJobDto.Description) ? job.Description.Replace("\n", Environment.NewLine) : updateJobDto.Description.Replace("\n", Environment.NewLine);
+        job.Location = job.Location == updateJobDto.Location || String.IsNullOrEmpty(updateJobDto.Location) ? job.Location : updateJobDto.Location;
+        job.CompanyOffers = job.CompanyOffers == updateJobDto.CompanyOffers || String.IsNullOrEmpty(updateJobDto.CompanyOffers) ? job.CompanyOffers.Replace("\n", Environment.NewLine) : updateJobDto.CompanyOffers.Replace("\n", Environment.NewLine);
+        job.City = job.City == updateJobDto.City || String.IsNullOrEmpty(updateJobDto.City) ? job.City : updateJobDto.City;
+        job.Selection = job.Selection == updateJobDto.Selection || String.IsNullOrEmpty(updateJobDto.Selection) ? job.Selection : updateJobDto.Selection;
+        job.Position = job.Position == updateJobDto.Position || String.IsNullOrEmpty(updateJobDto.Position) ? job.Position : updateJobDto.Position;
+        job.PositionLevel = job.PositionLevel == updateJobDto.PositionLevel || String.IsNullOrEmpty(updateJobDto.PositionLevel) ? job.PositionLevel : updateJobDto.PositionLevel;
+        job.RemoteWork = (bool)updateJobDto.RemoteWork;
+
+        if (updateJobDto.SalaryUp > 0 && updateJobDto.SalaryUp > job.Salary)
+            job.SalaryUp = (double)updateJobDto.SalaryUp;
+        if(updateJobDto.Salary > 0 && updateJobDto.Salary < job.SalaryUp)
+            job.Salary = (double)updateJobDto.Salary;
+
+        for (int i = 0; i < updateJobDto.Requirements.Count && i < job.Requirements.Count; i++)
+        {
+            if (updateJobDto.Requirements[i]?.Name != job.Requirements[i].Name)
+                job.Requirements[i].Name = updateJobDto.Requirements[i].Name;
+        }
+
+        for (int i = job.Requirements.Count - 1; i >= updateJobDto.Requirements.Count; i--)
+        {
+            job.Requirements.RemoveAt(i);
+        }
+
+        job.Requirements.RemoveAll(e => string.IsNullOrEmpty(e.Name));
+        updateJobDto.Requirements.RemoveAll(e => string.IsNullOrEmpty(e.Name));
+
+        for (int i = 0; i < updateJobDto.Requirements.Count; i++)
+        {
+            if (i < job.Requirements.Count)
+                job.Requirements[i].Name = updateJobDto.Requirements[i].Name;
+            else
+            {
+                job.Requirements.Add(new Requirements
+                {
+                    Name = updateJobDto.Requirements[i].Name,
+                    JobId = job.Id
+                });
+            }
+        }
+
+        await _jobsRepository.UpdateJobAsync(job);
+
+        return Ok("Atnaujinta!");
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<string>> DeleteJobAsync(int id)
+    {
+        var job = await _jobsRepository.GetJobAsync(id);
+        if (job == null)
+            return NotFound($"Job {id} does not exist!"); //change
+        await _jobsRepository.DeleteJobAsync(job);
+
+        return NoContent();
+    }
 }

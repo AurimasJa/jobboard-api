@@ -11,6 +11,7 @@ namespace jobboard.Data.Repositories
         Task CreateJobRequirementsAsync(Requirements requirement);
         Task CreateJobSkillsAsync(Skills skills);
         Task DeleteJobAsync(Job job);
+        Task DeleteRequirementAsync(Requirements requirement);
         Task<Job?> GetJobAsync(int jobId); 
         Task<IReadOnlyList<Job>> GetJobsAsync();
         Task<IReadOnlyList<Job>> GetSimilarJobsAsync(string position, string city, int id);
@@ -33,7 +34,7 @@ namespace jobboard.Data.Repositories
 
         public async Task<Job?> GetJobAsync(int jobId)
         {
-            return await _db.Jobs.Include(e => e.Company).FirstOrDefaultAsync(x => x.Id == jobId);
+            return await _db.Jobs.Include(e => e.Company).Include(e => e.Requirements).FirstOrDefaultAsync(x => x.Id == jobId);
         }
 
         //public async Task<JobResumes> GetJobResumeAsync(int jobId, int resumeId)
@@ -117,6 +118,11 @@ namespace jobboard.Data.Repositories
         public async Task DeleteJobAsync(Job job)
         {
             _db.Jobs.Remove(job);
+            await _db.SaveChangesAsync();
+        }
+        public async Task DeleteRequirementAsync(Requirements requirement) 
+        {
+            _db.Requirements.Remove(requirement);
             await _db.SaveChangesAsync();
         }
     }

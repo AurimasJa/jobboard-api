@@ -4,6 +4,7 @@ using jobboard.Data.Models;
 using jobboard.Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.Design;
 
 namespace jobboard.Controllers
 {
@@ -45,6 +46,23 @@ namespace jobboard.Controllers
                 x.IsHidden
             ));
         }
+
+
+        [HttpGet]
+        [Route("specific/{id}")]
+        public async Task<IEnumerable<JobResumes>> GetJobResumesAppliedDto(int id)
+        {
+            var jobResumes = await _jobResumesRepository.GetSelectedJobResumes(id);
+            return jobResumes.Select(x => new JobResumes
+            {
+                Id = x.Id,
+                Resume = x.Resume,
+                Job = x.Job,
+                Reviewed = x.Reviewed,
+                CreationDate = x.CreationDate
+            });
+        }
+
         //APPLY
         [HttpPost]
         public async Task<ActionResult<JobResumesDto>> Create(CreateJobResumesDto createJobResumesDto)
@@ -62,6 +80,22 @@ namespace jobboard.Controllers
             await _jobResumesRepository.CreateJobResumesAsync(jobresumes);
 
             return Created("", new JobResumesDto(job.Id));
+        }
+
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<ActionResult<JobResumes>> UpdateReviewCount(int id, UpdateJobResumeDto updateJobResumeDto)
+        {
+            var jobResumes = await _jobResumesRepository.GetJobAsync(id);
+            if (jobResumes == null)
+                return NotFound("Įvyko klaida.");
+
+            jobResumes.Reviewed += updateJobResumeDto.reviewed;
+
+            await _jobResumesRepository.UpdateJobResumesAsync(jobResumes);
+
+            return Ok("Success!");
         }
     }
 }

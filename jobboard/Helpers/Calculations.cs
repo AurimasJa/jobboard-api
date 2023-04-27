@@ -19,6 +19,7 @@ namespace jobboard.Helpers
         {
             var avg = jobs.GroupBy(j => j.City)
                                    .Select(x => new AverageSalary { CityName = x.Key, AverageCitySalary = x.Average(j => j.Salary) })
+                                       .Take(10)
                                    .ToList();
             return avg;
         }
@@ -26,7 +27,7 @@ namespace jobboard.Helpers
         {
             var biggestCompanies = jobs.GroupBy(j => j.CompanyId)
                                        .OrderByDescending(g => g.Count())
-                                       .Take(5)
+                                       .Take(10)
                                        .Select(g => companies.Single(c => c.Id == g.Key))
                                        .ToList();
 

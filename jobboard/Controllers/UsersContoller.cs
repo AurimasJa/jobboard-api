@@ -60,6 +60,8 @@ namespace jobboard.Controllers
                 company.Created,
                 company.Site,
                 company.ContactPerson,
+                company.Name,
+                company.Surname,
                 company.Email
 
             );
@@ -111,7 +113,7 @@ namespace jobboard.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<SuccessfulLoginDto>> UpdateJobValidity(string id, UpdateUserDto updateUserDto)
+        public async Task<ActionResult<SuccessfulLoginDto>> UpdateUserProfile(string id, UpdateUserDto updateUserDto)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -146,5 +148,47 @@ namespace jobboard.Controllers
 
             return Ok(new SuccessfulLoginDto(accesToken));
         }
+
+        [HttpPut("company/{id}")]
+        public async Task<ActionResult<SuccessfulLoginDto>> UpdateCompanyProfile(string id, UpdateCompanyDto updateCompanyDto)
+        {
+            var company = await _userManager.FindByIdAsync(id);
+            if (company == null)
+                return NotFound($"Įvyko klaida");
+
+            company.Surname = company.Surname == updateCompanyDto.Surname || String.IsNullOrEmpty(updateCompanyDto.Surname) ? company.Surname : updateCompanyDto.Surname;
+            company.Name = company.Name == updateCompanyDto.Name || String.IsNullOrEmpty(updateCompanyDto.Name) ? company.Name : updateCompanyDto.Name;
+            company.Email = company.Email == updateCompanyDto.Email || String.IsNullOrEmpty(updateCompanyDto.Email) ? company.Email : updateCompanyDto.Email;
+            company.City = company.City == updateCompanyDto.City || String.IsNullOrEmpty(updateCompanyDto.City) ? company.City : updateCompanyDto.City;
+            company.Address = company.Address == updateCompanyDto.Address || String.IsNullOrEmpty(updateCompanyDto.Address) ? company.Address : updateCompanyDto.Address;
+            company.Site = company.Site == updateCompanyDto.Site || String.IsNullOrEmpty(updateCompanyDto.Site) ? company.Site : updateCompanyDto.Site;
+            company.PhoneNumber = company.PhoneNumber == updateCompanyDto.PhoneNumber || String.IsNullOrEmpty(updateCompanyDto.PhoneNumber) ? company.PhoneNumber : updateCompanyDto.PhoneNumber;
+            company.CompanyCode = company.CompanyCode == updateCompanyDto.CompanyCode || String.IsNullOrEmpty(updateCompanyDto.CompanyCode) ? company.CompanyCode : updateCompanyDto.CompanyCode;
+            company.CompanyName = company.CompanyName == updateCompanyDto.CompanyName || String.IsNullOrEmpty(updateCompanyDto.CompanyName) ? company.CompanyName : updateCompanyDto.CompanyName;
+            company.AboutSection = company.AboutSection == updateCompanyDto.AboutSection || String.IsNullOrEmpty(updateCompanyDto.AboutSection) ? company.AboutSection : updateCompanyDto.AboutSection;
+            company.ContactPerson = company.Name + " " + company.Surname;
+
+            if (updateCompanyDto.Password is not null && updateCompanyDto.NewPassword is not null)
+            {
+                var isPasswordValid = await _userManager.CheckPasswordAsync(company, updateCompanyDto.Password);
+                if (!isPasswordValid)
+                    return BadRequest("Nepavyko atnaujinti slaptažodžio");
+                var token = await _userManager.GeneratePasswordResetTokenAsync(company);
+                var result = await _userManager.ResetPasswordAsync(company, token, updateCompanyDto.NewPassword);
+                if (!result.Succeeded)
+                    return BadRequest("Nepavyko atnaujinti slaptažodžio");
+            }
+
+            var response = await _userManager.UpdateAsync(company);
+            if (!response.Succeeded)
+                return BadRequest("Nepavyko atnaujinti naudotojo");
+
+            var roles = await _userManager.GetRolesAsync(company);
+            var fullName = company.Name;
+            var accesToken = _jwtTokenService.CreateAccessToken(fullName, company.Id, roles);
+
+            return Ok(new SuccessfulLoginDto(accesToken));
+        }
+
     }
 }
