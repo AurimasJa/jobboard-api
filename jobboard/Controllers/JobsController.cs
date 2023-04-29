@@ -245,9 +245,9 @@ public class JobsController : ControllerBase
             return NotFound($"Įvyko klaida");
 
         job.Title = job.Title == updateJobDto.Title || String.IsNullOrEmpty(updateJobDto.Title) ? job.Title : updateJobDto.Title;
-        job.Description = job.Description == updateJobDto.Description || String.IsNullOrEmpty(updateJobDto.Description) ? job.Description.Replace("\n", Environment.NewLine) : updateJobDto.Description.Replace("\n", Environment.NewLine);
+        job.Description = updateJobDto.Description.Replace("\n", Environment.NewLine);
         job.Location = job.Location == updateJobDto.Location || String.IsNullOrEmpty(updateJobDto.Location) ? job.Location : updateJobDto.Location;
-        job.CompanyOffers = job.CompanyOffers == updateJobDto.CompanyOffers || String.IsNullOrEmpty(updateJobDto.CompanyOffers) ? job.CompanyOffers.Replace("\n", Environment.NewLine) : updateJobDto.CompanyOffers.Replace("\n", Environment.NewLine);
+        job.CompanyOffers = updateJobDto.CompanyOffers.Replace("\n", Environment.NewLine);
         job.City = job.City == updateJobDto.City || String.IsNullOrEmpty(updateJobDto.City) ? job.City : updateJobDto.City;
         job.Selection = job.Selection == updateJobDto.Selection || String.IsNullOrEmpty(updateJobDto.Selection) ? job.Selection : updateJobDto.Selection;
         job.Position = job.Position == updateJobDto.Position || String.IsNullOrEmpty(updateJobDto.Position) ? job.Position : updateJobDto.Position;
