@@ -6,7 +6,7 @@ namespace jobboard.Helpers
     public interface ICalculations
     {
         List<AverageSalary> GetCityAverageSalaries(IReadOnlyList<Job> jobs);
-        List<CompanyDto> GetBiggestCompanies(IReadOnlyList<Job> jobs, IList<JobBoardUser> companies);
+        List<BiggestCompaniesDto> GetBiggestCompanies(IReadOnlyList<Job> jobs, IList<JobBoardUser> companies);
     }
 
     public class Calculations : ICalculations
@@ -23,18 +23,20 @@ namespace jobboard.Helpers
                                    .ToList();
             return avg;
         }
-        public List<CompanyDto> GetBiggestCompanies(IReadOnlyList<Job> jobs, IList<JobBoardUser> companies)
+        public List<BiggestCompaniesDto> GetBiggestCompanies(IReadOnlyList<Job> jobs, IList<JobBoardUser> companies)
         {
-            var biggestCompanies = jobs.GroupBy(j => j.CompanyId)
+            var biggestCompanies = jobs.Where(j => !j.IsHidden)
+                                       .GroupBy(j => j.CompanyId)
                                        .OrderByDescending(g => g.Count())
                                        .Take(10)
                                        .Select(g => companies.Single(c => c.Id == g.Key))
                                        .ToList();
 
-            var result = new List<CompanyDto>();
+            var result = new List<BiggestCompaniesDto>();
             foreach (var company in biggestCompanies)
             {
-                var companyDto = new CompanyDto(company.Id, company.CompanyName, company.Address, company.Email);
+                var total = jobs.Count(j => j.CompanyId == company.Id);
+                var companyDto = new BiggestCompaniesDto(company.Id, company.CompanyName, company.Address, total);
                 result.Add(companyDto);
             }
 

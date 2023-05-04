@@ -4,6 +4,7 @@ using jobboard.Data.Entities;
 using jobboard.Data.Models;
 using jobboard.Data.Repositories;
 using jobboard.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,135 +21,127 @@ public class JobsController : ControllerBase
     public readonly IJobsRepository _jobsRepository;
     public readonly IResumesRepository _resumesRepository;
     public readonly UserManager<JobBoardUser> _userManager;
-    public JobsController(IJobsRepository jobsRepository, UserManager<JobBoardUser> userManager, ICalculations calc, IResumesRepository resumesRepository)
+    public readonly IAuthorizationService _authorizationService;
+    public JobsController(IJobsRepository jobsRepository, UserManager<JobBoardUser> userManager, ICalculations calc, IResumesRepository resumesRepository, IAuthorizationService authorizationService)
     {
         _calc = calc;
         _jobsRepository = jobsRepository;
         _userManager = userManager;
         _resumesRepository = resumesRepository;
+        _authorizationService = authorizationService;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Job>> GetJobsAsync()
+    public async Task<IEnumerable<JobDto>> GetJobsAsync()
     {
-
-        //TODO: hangfire
         _jobsRepository.CheckAndUpdateValidityDate();
 
         var jobs = await _jobsRepository.GetJobsAsync();
-        return jobs.Select(x => new Job
-        {
-            Id = x.Id,
-            City = x.City,
-            Description = x.Description,
-            Title = x.Title,
-            Salary = x.Salary,
-            SalaryUp = x.SalaryUp,
-            //Location = x.Location,
-            CreationDate = x.CreationDate,
-            Position = x.Position,
-            //Skills = x.Skills,
-            //CompanyOffers = x.CompanyOffers,
-            //Company = x.Company,
-            //TotalWorkHours = x.TotalWorkHours,
-            ////Requirements = x.Requirements
-            //Selection = x.Selection,
-            //PositionLevel = x.PositionLevel,
-            RemoteWork = x.RemoteWork,
-            IsHidden = x.IsHidden
-        });
+        return jobs.Select(x => new JobDto
+        (
+            x.Id,
+            x.City,
+            x.Description,
+            x.Title,
+            x.Salary,
+            x.SalaryUp,
+            x.CreationDate,
+            x.Position,
+            x.RemoteWork,
+            x.IsHidden
+        ));
     }
     [HttpGet("details")]
-    public async Task<IEnumerable<Job>> GetSimilarJobsAsync(string position, string city, int id)
+    public async Task<IEnumerable<JobDto>> GetSimilarJobsAsync(string position, string city, int id)
     {
-
-        //TODO: hangfire
         _jobsRepository.CheckAndUpdateValidityDate();
 
         var jobs = await _jobsRepository.GetSimilarJobsAsync(position, city, id);
-        return jobs.Select(x => new Job
-        {
-            Id = x.Id,
-            City = x.City,
-            Description = x.Description,
-            Title = x.Title,
-            Salary = x.Salary,
-            SalaryUp = x.SalaryUp,
-            //Location = x.Location,
-            CreationDate = x.CreationDate,
-            Position = x.Position,
-            //Skills = x.Skills,
-            //CompanyOffers = x.CompanyOffers,
-            //Company = x.Company,
-            //TotalWorkHours = x.TotalWorkHours,
-            ////Requirements = x.Requirements
-            //Selection = x.Selection,
-            //PositionLevel = x.PositionLevel,
-            RemoteWork = x.RemoteWork,
-            IsHidden = x.IsHidden
-        });
+        return jobs.Select(x => new JobDto
+        (
+            x.Id,
+            x.City,
+            x.Description,
+            x.Title,
+            x.Salary,
+            x.SalaryUp,
+            x.CreationDate,
+            x.Position,
+            x.RemoteWork,
+            x.IsHidden
+        ));
     }
     [HttpGet("company/{companyId}")]
-    public async Task<IEnumerable<Job>> GetCompanyJobsAsync(string companyId)
+    public async Task<IEnumerable<JobDto>> GetCompanyJobsAsync(string companyId)
     {
 
         //TODO: hangfire
         _jobsRepository.CheckAndUpdateValidityDate();
 
         var jobs = await _jobsRepository.GetCompanyJobsAsync(companyId);
-        return jobs.Select(x => new Job
-        {
-            Id = x.Id,
-            City = x.City,
-            Description = x.Description,
-            Title = x.Title,
-            Salary = x.Salary,
-            SalaryUp = x.SalaryUp,
-            //Location = x.Location,
-            CreationDate = x.CreationDate,
-            Position = x.Position,
-            //Skills = x.Skills,
-            //CompanyOffers = x.CompanyOffers,
-            //Company = x.Company,
-            //TotalWorkHours = x.TotalWorkHours,
-            ////Requirements = x.Requirements
-            //Selection = x.Selection,
-            //PositionLevel = x.PositionLevel,
-            RemoteWork = x.RemoteWork,
-            IsHidden = x.IsHidden
-        });
+        return jobs.Select(x => new JobDto
+        (
+            x.Id,
+            x.City,
+            x.Description,
+            x.Title,
+            x.Salary,
+            x.SalaryUp,
+            x.CreationDate,
+            x.Position,
+            x.RemoteWork,
+            x.IsHidden
+        ));
     }
+    [HttpGet("latest")]
+    public async Task<IEnumerable<JobDto>> GetLatestJobsAsync()
+    {
+        var jobs = await _jobsRepository.GetLatestJobsAsync();
 
+        return jobs.Select(x => new JobDto
+        (
+            x.Id,
+            x.City,
+            x.Description,
+            x.Title,
+            x.Salary,
+            x.SalaryUp,
+            x.CreationDate,
+            x.Position,
+            x.RemoteWork,
+            x.IsHidden
+        ));
+    }
+    
     [HttpGet("{id}")]
-    public async Task<ActionResult<Job>> GetJobAsync(int id)
+    public async Task<ActionResult<FullJobDto>> GetJobAsync(int id)
     {
         var job = await _jobsRepository.GetRequirementsAsync(id);
         if(job == null) 
-            return null;
-        var x = _userManager.FindByIdAsync(job.CompanyId);
-        return new Job
-        {
-            Id = job.Id,
-            Company = x.Result,
-            Title = job.Title,
-            Description = job.Description.Replace(Environment.NewLine, "<br />"),
-            Position = job.Position,
-            PositionLevel = job.PositionLevel,
-            CompanyOffers = job.CompanyOffers.Replace(Environment.NewLine, "<br />"),
-            Requirements = job.Requirements,
-            City = job.City,
-            SalaryUp = job.SalaryUp,
-            Location = job.Location,
-            Salary = job.Salary,
-            TotalWorkHours = job.TotalWorkHours,
-            RemoteWork = job.RemoteWork,
-            Selection = job.Selection,
-            CreationDate = job.CreationDate,
-            ValidityDate = job.ValidityDate,
-            IsHidden = job.IsHidden
-        };
+            return NotFound($"Darbas {id} neegzistuoja!");
+        var temp = await _userManager.FindByIdAsync(job.CompanyId);
+        return new FullJobDto
+    (
+        job.Id,
+        new CompanyJobDto(temp.Id, temp.CompanyName, temp.ContactPerson, temp.PhoneNumber),
+        job.Title,
+        job.Description.Replace(Environment.NewLine, "<br />"),
+        job.Position,
+        job.PositionLevel,
+        job.CompanyOffers.Replace(Environment.NewLine, "<br />"),
+        job.Requirements,
+        job.City,
+        job.SalaryUp,
+        job.Location,
+        job.Salary,
+        job.TotalWorkHours,
+        job.RemoteWork,
+        job.Selection,
+        job.CreationDate,
+        job.ValidityDate,
+        job.IsHidden
+    );
     }
-
 
     [HttpGet("average")]
     public async Task<IEnumerable<AverageSalary>> GetAverageCitySalary()
@@ -162,7 +155,7 @@ public class JobsController : ControllerBase
         });
     }
     [HttpGet("biggest/companies")]
-    public async Task<IEnumerable<CompanyDto>> GetBiggestCompanies()
+    public async Task<IEnumerable<BiggestCompaniesDto>> GetBiggestCompanies()
     {
         var jobs = await _jobsRepository.GetJobsAsync();
         var companies = await _userManager.GetUsersInRoleAsync(Roles.Darbdavys);
@@ -171,6 +164,7 @@ public class JobsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys)]
     public async Task<ActionResult<CreateJobCommand>> Create(CreateJobCommand createJobCommand)
     {
         if (!ModelState.IsValid)
@@ -204,7 +198,7 @@ public class JobsController : ControllerBase
             await _jobsRepository.CreateJobRequirementsAsync(requirement);
         };
 
-        return Created("", new GetJobCommand(job.Id, job.Company));
+        return Created("", new GetJobCommand(job.Id));
     }
 
 
@@ -214,6 +208,12 @@ public class JobsController : ControllerBase
         var oldJob = await _jobsRepository.GetJobAsync(id);
         if (oldJob == null)
             return NotFound($"Job {id} does not exist!"); //change
+
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, oldJob, PolicyNames.CompanyOwner);
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
 
         oldJob.IsHidden = updateJobValidityDto.IsHidden;
         oldJob.ValidityDate = updateJobValidityDto.ValidityDate;
@@ -243,7 +243,11 @@ public class JobsController : ControllerBase
         var job = await _jobsRepository.GetJobAsync(id);
         if (job == null)
             return NotFound($"Įvyko klaida");
-
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, job, PolicyNames.CompanyOwner);
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
         job.Title = job.Title == updateJobDto.Title || String.IsNullOrEmpty(updateJobDto.Title) ? job.Title : updateJobDto.Title;
         job.Description = updateJobDto.Description.Replace("\n", Environment.NewLine);
         job.Location = job.Location == updateJobDto.Location || String.IsNullOrEmpty(updateJobDto.Location) ? job.Location : updateJobDto.Location;
@@ -298,6 +302,12 @@ public class JobsController : ControllerBase
         var job = await _jobsRepository.GetJobAsync(id);
         if (job == null)
             return NotFound($"Job {id} does not exist!"); //change
+
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, job, PolicyNames.CompanyOwner);
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
         await _jobsRepository.DeleteJobAsync(job);
 
         return NoContent();

@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace jobboard.Data.Models
 {
-    public class Job
+    public class Job : ICompanyOwnedResource
     {
         public int Id { get; set; }
         public string Title { get; set; } // pavadinimas
         public string Description { get; set; } //darbo aprašymas
         public DateTime CreationDate { get; set; } //skelbimo kūrimo data
         public DateTime ValidityDate { get; set; } //skelbimo galiojimo laikas - 30d.
-        //public string Requirements { get; set; }//reikalavimai
         public virtual List<Requirements> Requirements { get; set; }
         public string Position { get; set; }//pareigos - advokatas, aktorius, programuotojas etc.
         public string PositionLevel { get; set; }//pareigų lygis
@@ -20,7 +19,6 @@ namespace jobboard.Data.Models
         public string City { get; set; }
         public double Salary { get; set; } //alga nuo
         public double SalaryUp { get; set; } //alga nuo
-        //public virtual List<Skills> Skills { get; set; } //Reikalingi skilai //nebutinaiiiiiiiiiiiiiiiiiiiiiiiiiiiiii JobOFFERS (COMPANY OFFERS)
         public bool RemoteWork { get; set; } //remote work?? taip/ne
         public string TotalWorkHours { get; set; } //full work, half, pilnas/visas etatas
         public string Selection { get; set; } //internetu, telefonu, tiesiogiai

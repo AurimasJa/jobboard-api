@@ -11,6 +11,8 @@ namespace jobboard.Data.Repositories
         Task<IReadOnlyList<JobResumes>> GetSelectedJobResumes(int jobId);
         Task<JobResumes?> GetJobAsync(int jobId);
         Task UpdateJobResumesAsync(JobResumes jobResumes);
+        Task<IReadOnlyList<JobResumes>> GetJobResumesByResume(int resumeId);
+        Task DeleteResumeSkillAsync(JobResumes jobResumes);
     }
 
     public class JobResumesRepository : IJobResumesRepository
@@ -21,7 +23,15 @@ namespace jobboard.Data.Repositories
         {
             _db = db;
         }
-        
+
+        public async Task<IReadOnlyList<JobResumes>> GetJobResumesByResume(int resumeId)
+        {
+            var local = await _db.JobResumes
+                .Include(e => e.Resume)
+                .Include(e => e.Job)
+                .Where(o => o.Resume.Id == resumeId).ToListAsync();
+            return local;
+        }
         public async Task<IReadOnlyList<JobResumes>> GetSelectedJobResumes(int jobId)
         {
             var local = await _db.JobResumes
@@ -58,6 +68,11 @@ namespace jobboard.Data.Repositories
         public async Task UpdateJobResumesAsync(JobResumes jobResumes)
         {
             _db.JobResumes.Update(jobResumes);
+            await _db.SaveChangesAsync();
+        }
+        public async Task DeleteResumeSkillAsync(JobResumes jobResumes)
+        {
+            _db.JobResumes.Remove(jobResumes);
             await _db.SaveChangesAsync();
         }
     }

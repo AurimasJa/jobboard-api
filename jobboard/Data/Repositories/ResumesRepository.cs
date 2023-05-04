@@ -11,12 +11,12 @@ namespace jobboard.Data.Repositories
         Task<IReadOnlyList<Resume>> GetResumesAsync();
         Task<IReadOnlyList<Resume>> GetUserResumesAsync(string userId);
         Task<Resume?> GetResumeAsync(int resumeId);
-        Task CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user);
+        Task<int> CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user);
         Task DeleteResumeAsync(Resume resume);
         Task UpdateResumeAsync(Resume resume);
         Task DeleteResumeExperienceAsync(Experience experience);
         Task DeleteResumeEducationAsync(Education education);
-         Task DeleteResumeSkillAsync(Skills skill);
+        Task DeleteResumeSkillAsync(Skills skill);
     }
 
     public class ResumesRepository : IResumesRepository
@@ -65,7 +65,7 @@ namespace jobboard.Data.Repositories
 
 
         //##################
-        public async Task CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user)
+        public async Task<int> CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user)
         {
             var resume = new Resume
             {
@@ -127,6 +127,7 @@ namespace jobboard.Data.Repositories
             }
 
             await _db.SaveChangesAsync();
+            return resume.Id;
         }
 
 

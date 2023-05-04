@@ -5,6 +5,8 @@ namespace jobboard.Auth;
 public record RegisterUserDto([Required(ErrorMessage = "Vardas yra privalomas.")] string Name, [Required(ErrorMessage = "Pavardė yra privaloma.")] string Surname, [Required(ErrorMessage = "El. paštas yra privalomas")] string Email,[Required(ErrorMessage = "Slaptažodis yra privalomas.")] string Password, [Required(ErrorMessage = "Data yra privaloma")] DateTime DateOfBirth,  string? AboutSection);
 public record LoginDto([Required(ErrorMessage = "El. paštas yra privalomas")] string Email, [Required(ErrorMessage = "Slaptažodis negali būti tuščias")] string Password);
 public record CompanyDto(string Id, string CompanyName, string Address, string Email);
+public record CompanyJobDto(string Id, string CompanyName, string ContactPerson, string PhoneNumber);
+public record BiggestCompaniesDto(string Id, string CompanyName, string Address, int JobCount);
 public record CompanyProfileDto(string CompanyName, string AboutSection, string CompanyCode, string PhoneNumber, string Address, string City, DateTime Created, string Site, string ContactPerson, string Name, string Surname, string Email);
 
 public record UserDto(string Id, string UserName, string Email);

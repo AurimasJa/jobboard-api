@@ -28,15 +28,6 @@ namespace jobboard.Data
                 Email = "admin@ad.com",
                 Name = "admin",
                 Surname = "admin",
-                //AboutSection = "admin",
-                //Site = "admin",
-                //Address = "admin",
-                //City = "admin",
-                //PhoneNumber = "12312312312",
-                //CompanyCode = "1111",
-                //CompanyName = "1111",
-                //ContactPerson = "1111",
-
             };
 
             var existingAdminUser = await _userManager.FindByNameAsync(newAdminUser.UserName);

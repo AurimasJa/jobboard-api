@@ -1,8 +1,9 @@
-﻿using static jobboard.Data.Enums;
+﻿using jobboard.Auth;
+using static jobboard.Data.Enums;
 
 namespace jobboard.Data.Entities
 {
-    public class Education 
+    public class Education
     {
         public int Id { get; set; }
         public string School { get; set; }

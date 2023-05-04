@@ -1,4 +1,5 @@
-﻿using jobboard.Data.Models;
+﻿using jobboard.Auth;
+using jobboard.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace jobboard.Data.Entities

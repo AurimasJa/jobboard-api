@@ -20,6 +20,7 @@ namespace jobboard.Data.Repositories
         Task UpdateJobAsync(Job job);
         Task<IReadOnlyList<Requirements>> GetJobRequirements(int jobId);
         Task<Job> GetRequirementsAsync(int jobId);
+        Task<IReadOnlyList<Job?>> GetLatestJobsAsync();
         void CheckAndUpdateValidityDate();
     }
 
@@ -54,6 +55,18 @@ namespace jobboard.Data.Repositories
 
             return job;
         }
+        public async Task<IReadOnlyList<Job?>> GetLatestJobsAsync()
+        {
+            var jobs = await _db.Jobs
+                      .Include(j => j.Requirements)
+                      .Where(j => !j.IsHidden)
+                      .OrderByDescending(j => j.CreationDate)
+                      .Take(12)
+                      .ToListAsync();
+
+            return jobs;
+        }
+
         public async Task<IReadOnlyList<Job>> GetJobsAsync()
         {
             return await _db.Jobs.ToListAsync();

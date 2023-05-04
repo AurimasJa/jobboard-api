@@ -18,16 +18,21 @@ public class ResumesController : ControllerBase
 {
     public readonly IResumesRepository _resumesRepository;
     public readonly IJobsRepository _jobsRepository;
+    public readonly IJobResumesRepository _jobResumesRepository;
     private readonly UserManager<JobBoardUser> _userManager;
+    private readonly IAuthorizationService _authorizationService;
 
-    public ResumesController(IResumesRepository resumesRepository, UserManager<JobBoardUser> userManager, IJobsRepository jobsRepository)
+    public ResumesController(IResumesRepository resumesRepository, UserManager<JobBoardUser> userManager, IJobsRepository jobsRepository, IAuthorizationService authorizationService, IJobResumesRepository jobResumesRepository)
     {
         _resumesRepository = resumesRepository;
         _userManager = userManager;
         _jobsRepository = jobsRepository;
+        _authorizationService = authorizationService;
+        _jobResumesRepository = jobResumesRepository;
     }
 
     [HttpGet]
+    [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys)]
     public async Task<IEnumerable<DisplayResumesDto>> GetResumesAsync()
     {
         var resumes = await _resumesRepository.GetResumesAsync();
@@ -51,11 +56,18 @@ public class ResumesController : ControllerBase
     }
 
     [HttpGet("user/{userId}")]
-    public async Task<IEnumerable<DisplayResumesDto>> GetUserResumesAsync(string userId)
+    public async Task<IActionResult> GetUserResumesAsync(string userId)
     {
         var resumes = await _resumesRepository.GetUserResumesAsync(userId);
-
-        return resumes.Select(x => new DisplayResumesDto
+        foreach (var resume in resumes)
+        {
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, resume, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+        return Ok(resumes.Select(x => new DisplayResumesDto
         (
             x.Id,
             x.FullName,
@@ -71,7 +83,7 @@ public class ResumesController : ControllerBase
             x.Summary,
             x.UserId,
             x.IsHidden
-        ));
+        )));
     }
 
     [HttpGet("{id}")]
@@ -111,9 +123,9 @@ public class ResumesController : ControllerBase
         var user = await _userManager.FindByIdAsync(id);
         if (user == null)
             return NotFound("Įvyko klaida!");
-        await _resumesRepository.CreateResumeAsync(createResumeCommand, id, user);
+        var temp = await _resumesRepository.CreateResumeAsync(createResumeCommand, id, user);
 
-        return Created("", id);
+        return Created("", temp);
     }
     [HttpPut("visibility/{id}")]
     public async Task<ActionResult<DisplayResumesDto>> UpdateResumeVisibility(int id, UpdateResumesVisibility updateResumesVisibility)
@@ -121,7 +133,11 @@ public class ResumesController : ControllerBase
         var oldResume = await _resumesRepository.GetResumeAsync(id);
         if (oldResume == null)
             return NotFound($"{id} CV neegzistuoja!"); //change
-
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, oldResume, PolicyNames.ResourceOwner);
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
         oldResume.IsHidden = updateResumesVisibility.isHidden;
 
         await _resumesRepository.UpdateResumeAsync(oldResume);
@@ -145,15 +161,17 @@ public class ResumesController : ControllerBase
         ));
     }
 
-
-
     [HttpPut("{id}")]
     public async Task<ActionResult<SuccessfulLoginDto>> UpdateResume(int id, UpdateResumeDto updateResumeDto)
     {
         var resume = await _resumesRepository.GetResumeAsync(id);
         if (resume == null)
             return NotFound($"Įvyko klaida");
-        
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, resume, PolicyNames.ResourceOwner);
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
         resume.FullName = string.IsNullOrEmpty(updateResumeDto.FullName) ? resume.FullName : updateResumeDto.FullName ?? resume.FullName;
         resume.Email = string.IsNullOrEmpty(updateResumeDto.Email) ? resume.Email : updateResumeDto.Email ?? resume.Email;
         resume.PhoneNumber = string.IsNullOrEmpty(updateResumeDto.PhoneNumber) ? resume.PhoneNumber : updateResumeDto.PhoneNumber ?? resume.PhoneNumber;
@@ -278,8 +296,19 @@ public class ResumesController : ControllerBase
     public async Task<ActionResult<string>> DeleteJobAsync(int id)
     {
         var resume = await _resumesRepository.GetResumeAsync(id);
+        var jobResumes = await _jobResumesRepository.GetJobResumesByResume(id);
         if (resume == null)
             return NotFound($"Resume {id} does not exist!"); //change
+
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, resume, PolicyNames.ResourceOwner);
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbid();
+        }
+        foreach (var item in jobResumes)
+        {
+            await _jobResumesRepository.DeleteResumeSkillAsync(item);
+        }
         await _resumesRepository.DeleteResumeAsync(resume);
 
         return NoContent();

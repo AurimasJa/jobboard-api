@@ -51,9 +51,17 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters.ValidIssuer = builder.Configuration["JWT:ValidIssuer"];
     options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]));
 });
+builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyNames.ResourceOwner, policy => policy.Requirements.Add(new ResourceOwnerRequirement()));
+    options.AddPolicy(PolicyNames.CompanyOwner, policy => policy.Requirements.Add(new CompanyRequirement()));
+});
 
 builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
-builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
+builder.Services.AddSingleton<IAuthorizationHandler, CompanyOwnerAuthorizationHandler>();
 builder.Services.AddScoped<AuthDbSeeder>();
 
 var app = builder.Build();

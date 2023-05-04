@@ -2,6 +2,7 @@
 using jobboard.Data.Entities;
 using jobboard.Data.Models;
 using jobboard.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
@@ -12,23 +13,36 @@ namespace jobboard.Controllers
     [Route("api/jobsresumes")]
     public class JobsResumesController : ControllerBase
     {
-        public readonly IResumesRepository _resumesRepository;
-        public readonly IJobsRepository _jobsRepository;
-        public readonly IJobResumesRepository _jobResumesRepository;
+        private readonly IResumesRepository _resumesRepository;
+        private readonly IJobsRepository _jobsRepository;
+        private readonly IJobResumesRepository _jobResumesRepository;
         private readonly UserManager<JobBoardUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public JobsResumesController(IResumesRepository resumesRepository, UserManager<JobBoardUser> userManager, IJobsRepository jobsRepository, IJobResumesRepository jobResumesRepository)
+        public JobsResumesController(IResumesRepository resumesRepository, UserManager<JobBoardUser> userManager, IJobsRepository jobsRepository, IJobResumesRepository jobResumesRepository, IAuthorizationService authorizationService)
         {
             _resumesRepository = resumesRepository;
             _userManager = userManager;
             _jobsRepository = jobsRepository;
             _jobResumesRepository = jobResumesRepository;
+            _authorizationService = authorizationService;
         }
         [HttpGet("{jobId}")]
-        public async Task<IEnumerable<DisplayResumesDto>> GetJobResumesAsync(int jobId)
+        public async Task<IActionResult> GetJobResumesAsync(int jobId)
         {
+            var job = await _jobsRepository.GetJobAsync(jobId);
+            if(job == null)
+                return NotFound($"{jobId} neegzistuoja!");
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, job, PolicyNames.CompanyOwner);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var resumes = await _jobResumesRepository.GetSelectedResumes(jobId);
-            return resumes.Select(x => new DisplayResumesDto
+
+            return Ok(resumes.Select(x => new DisplayResumesDto
             (
                 x.Id,
                 x.FullName,
@@ -44,9 +58,16 @@ namespace jobboard.Controllers
                 x.Position,
                 x.UserId,
                 x.IsHidden
-            ));
+            )));
         }
+        [HttpGet("count/{jobId}")]
+        public async Task<int> GetJobResumesCountAsync(int jobId)
+        {
+         
+            var resumes = await _jobResumesRepository.GetSelectedResumes(jobId);
 
+            return resumes.Count;
+        }
 
         [HttpGet]
         [Route("specific/{id}")]

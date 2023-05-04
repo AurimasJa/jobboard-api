@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace jobboard.Controllers
 {
     [ApiController]
-    [Route("api/companiesresume/")]
+    [Route("api/companiesresume")]
     public class CompaniesResumeController : ControllerBase
     {
         public readonly IResumesRepository _resumesRepository;
@@ -24,19 +24,6 @@ namespace jobboard.Controllers
             _companiesResumesRepository = companiesResumesRepository;
         }
 
-
-        [HttpGet("reviewed/{resumeId}")]
-        public async Task<IEnumerable<JobBoardUser>> GetUserResumesAsync(int resumeId)
-        {
-            var companies = await _companiesResumesRepository.GetReviewedResumesAsync(resumeId);
-            return companies.Select(x => new JobBoardUser
-            {
-                Id = x.Id,
-                CompanyName = x.CompanyName,
-                City = x.City,
-                Name = x.Name,
-            });
-        }
         [HttpGet]
         [Route("companies/{id}")]
         public async Task<IEnumerable<CompaniesResumesDto>> GetCompaniesViews(string id)
@@ -48,7 +35,9 @@ namespace jobboard.Controllers
                 var temp = await _companiesResumesRepository.GetCompaniesResumesAsync(item.Id);
                 views.AddRange(temp);
             }
-            return views.Select(x => new CompaniesResumesDto
+            var viewsByDate = views.OrderByDescending(j => j.ReviewDate);
+
+            return viewsByDate.Select(x => new CompaniesResumesDto
             (
                 x.Id,
                 new DisplayCustomCompanyInfoDto

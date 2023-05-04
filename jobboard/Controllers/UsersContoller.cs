@@ -79,7 +79,8 @@ namespace jobboard.Controllers
                 var temp = await _jobsRepository.GetJobResumesAsync(item.Id);
                 applied.AddRange(temp);
             }
-            return applied.Select(x => new JobResumesAppliedToDto
+            var appliedByDate = applied.OrderByDescending(j => j.CreationDate);
+            return appliedByDate.Select(x => new JobResumesAppliedToDto
             (
                 x.Id,
                 new DisplayedJobDto

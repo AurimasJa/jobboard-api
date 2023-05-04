@@ -1,4 +1,6 @@
-﻿namespace jobboard.Data.Entities
+﻿using jobboard.Auth;
+
+namespace jobboard.Data.Entities
 {
     public class Experience
     {
