@@ -2,9 +2,11 @@
 using jobboard.Data.Entities;
 using jobboard.Data.Models;
 using jobboard.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 
 namespace jobboard.Controllers
 {
@@ -151,6 +153,7 @@ namespace jobboard.Controllers
         }
 
         [HttpPut("company/{id}")]
+        [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys)]
         public async Task<ActionResult<SuccessfulLoginDto>> UpdateCompanyProfile(string id, UpdateCompanyDto updateCompanyDto)
         {
             var company = await _userManager.FindByIdAsync(id);

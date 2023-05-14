@@ -3,7 +3,7 @@ using jobboard.Data.Entities;
 
 namespace jobboard.Data.Models;
 
-public record JobDto(int Id, string City, string Description, string Title, double Salary, double SalaryUp, DateTime CreationDate, string Position, bool RemoteWork, bool IsHidden);
+public record JobDto(int Id, string City, string Description, string Title, double Salary, double SalaryUp, DateTime CreationDate, string Position, bool RemoteWork, string TotalWorkHours, bool IsHidden);
 public record FullJobDto(int Id, CompanyJobDto Company, string Title, string Description, string Position, string PositionLevel,
     string CompanyOffers, List<Requirements> Requirements, string City, double SalaryUp,string Location, double Salary,
     string TotalWorkHours, bool RemoteWork, string Selection, DateTime CreationDate, DateTime ValidityDate, bool IsHidden);

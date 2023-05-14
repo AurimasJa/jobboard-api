@@ -2,8 +2,10 @@
 using jobboard.Data.Entities;
 using jobboard.Data.Models;
 using jobboard.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace jobboard.Controllers
 {
@@ -25,6 +27,7 @@ namespace jobboard.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys + "," + Roles.Darbuotojas)]
         [Route("companies/{id}")]
         public async Task<IEnumerable<CompaniesResumesDto>> GetCompaniesViews(string id)
         {
@@ -62,6 +65,7 @@ namespace jobboard.Controllers
             ));
         }
         [HttpPost]
+        [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys + "," + Roles.Darbuotojas)]
         public async Task<ActionResult<CompaniesResumesDto>> Create(CreateCompaniesReviewDto createCompaniesReviewDto)
         {
             var company = await _userManager.FindByIdAsync(createCompaniesReviewDto.CompanyId);

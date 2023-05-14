@@ -87,6 +87,7 @@ public class ResumesController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys + "," + Roles.Darbuotojas)]
     public async Task<ActionResult<DisplayResumesDto>> GetResumeAsync(int id)
     {
         var resume = await _resumesRepository.GetResumeAsync(id);
@@ -113,6 +114,7 @@ public class ResumesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbuotojas)]
     public async Task<ActionResult<DisplayCreatedResumeDto>> Create(CreateResumeCommand createResumeCommand)
     {
         ///VALIDATION

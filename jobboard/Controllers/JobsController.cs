@@ -48,6 +48,7 @@ public class JobsController : ControllerBase
             x.CreationDate,
             x.Position,
             x.RemoteWork,
+            x.TotalWorkHours,
             x.IsHidden
         ));
     }
@@ -68,6 +69,7 @@ public class JobsController : ControllerBase
             x.CreationDate,
             x.Position,
             x.RemoteWork,
+            x.TotalWorkHours,
             x.IsHidden
         ));
     }
@@ -90,6 +92,7 @@ public class JobsController : ControllerBase
             x.CreationDate,
             x.Position,
             x.RemoteWork,
+            x.TotalWorkHours,
             x.IsHidden
         ));
     }
@@ -109,6 +112,7 @@ public class JobsController : ControllerBase
             x.CreationDate,
             x.Position,
             x.RemoteWork,
+            x.TotalWorkHours,
             x.IsHidden
         ));
     }

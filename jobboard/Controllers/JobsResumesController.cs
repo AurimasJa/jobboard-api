@@ -70,6 +70,7 @@ namespace jobboard.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys + "," + Roles.Darbuotojas)]
         [Route("specific/{id}")]
         public async Task<IEnumerable<JobResumes>> GetJobResumesAppliedDto(int id)
         {
@@ -86,6 +87,7 @@ namespace jobboard.Controllers
 
         //APPLY
         [HttpPost]
+        [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys + "," + Roles.Darbuotojas)]
         public async Task<ActionResult<JobResumesDto>> Create(CreateJobResumesDto createJobResumesDto)
         {
             var job = await _jobsRepository.GetJobAsync(createJobResumesDto.JobId);
@@ -105,6 +107,7 @@ namespace jobboard.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys + "," + Roles.Darbuotojas)]
         [Route("{id}")]
         public async Task<ActionResult<JobResumes>> UpdateReviewCount(int id, UpdateJobResumeDto updateJobResumeDto)
         {
