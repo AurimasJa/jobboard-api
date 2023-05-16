@@ -7,7 +7,6 @@ using jobboard.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -78,8 +77,6 @@ public class JobsController : ControllerBase
     [HttpGet("company/{companyId}")]
     public async Task<IEnumerable<JobDto>> GetCompanyJobsAsync(string companyId)
     {
-
-        //TODO: hangfire
         _jobsRepository.CheckAndUpdateValidityDate();
 
         var jobs = await _jobsRepository.GetCompanyJobsAsync(companyId);
@@ -173,8 +170,6 @@ public class JobsController : ControllerBase
     [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys)]
     public async Task<IActionResult> Create(CreateJobCommand createJobCommand)
     {
-        //if (!ModelState.IsValid)
-        //    return BadRequest(ModelState);
         var validator = new ValidatorJob(createJobCommand);
         var results = validator.Validate(new ValidationContext(createJobCommand));
         if (results.Any())
@@ -214,7 +209,6 @@ public class JobsController : ControllerBase
 
 
     [HttpPut("validity/{id}")]
-    //ActionResult<DisplayedJobDto>
     public async Task<IActionResult> UpdateJobValidity(int id, UpdateJobValidityDto updateJobValidityDto)
     {
         var oldJob = await _jobsRepository.GetJobAsync(id);

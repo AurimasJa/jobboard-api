@@ -120,10 +120,6 @@ public class ResumesController : ControllerBase
     [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbuotojas)]
     public async Task<ActionResult<DisplayCreatedResumeDto>> Create(CreateResumeCommand createResumeCommand)
     {
-        ///VALIDATION
-        ///
-        ///
-        ///
         var id = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
         var user = await _userManager.FindByIdAsync(id);
         if (user == null)

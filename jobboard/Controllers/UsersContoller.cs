@@ -125,10 +125,6 @@ namespace jobboard.Controllers
             user.Surname = user.Surname == updateUserDto.Surname || String.IsNullOrEmpty(updateUserDto.Surname) ? user.Surname : updateUserDto.Surname;
             user.Name = user.Name == updateUserDto.Name || String.IsNullOrEmpty(updateUserDto.Name) ? user.Name : updateUserDto.Name;
             user.Email = user.Email == updateUserDto.Email || String.IsNullOrEmpty(updateUserDto.Email) ? user.Email : updateUserDto.Email;
-            //if(updateUserDto.DateOfBirth is not null)
-            //{
-            //    user.DateOfBirth = user.DateOfBirth == updateUserDto.DateOfBirth ? user.DateOfBirth : updateUserDto.DateOfBirth;
-            //}
 
             if(updateUserDto.Password is not null && updateUserDto.NewPassword is not null)
             {

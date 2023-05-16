@@ -1,22 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using jobboard.Auth;
 using jobboard.Controllers;
 using jobboard.Data.Repositories;
 using jobboard.Data.Models;
 using jobboard.Data.Entities;
-using static System.Reflection.Metadata.BlobBuilder;
 using jobboard.Data;
-using jobboard.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using static jobboard.Data.Enums;
 
 namespace JobBoardTests.Controllers
 {
@@ -48,14 +42,13 @@ namespace JobBoardTests.Controllers
             mockAuthService = new Mock<IAuthorizationService>();
             mockUserStore = new Mock<IUserStore<JobBoardUser>>();
             mockUserManager = new Mock<UserManager<JobBoardUser>>(mockUserStore.Object, null, null, null, null, null, null, null, null);
-            // Create a new instance of JobBoardUser to use in the test
             _user = new JobBoardUser
             {
                 Id = "1",
                 UserName = "user",
-                Email = "testuser@example.com",
-                CompanyName = "Acme Corp",
-                ContactPerson = "John Doe",
+                Email = "test@test.com",
+                CompanyName = "test",
+                ContactPerson = "test",
                 PhoneNumber = "123456789",
                 Site = "Nera",
                 City = "Yra",
