@@ -53,11 +53,12 @@ namespace jobboard.Controllers
                 x.Education,
                 x.Skills,
                 x.Experience,
-                x.Summary,
-                x.YearOfBirth,
                 x.Position,
+                x.YearOfBirth,
+                x.Summary,
                 x.UserId,
-                x.IsHidden
+                x.IsHidden,
+                x.Salary
             )));
         }
         [HttpGet("count/{jobId}")]

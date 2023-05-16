@@ -78,6 +78,7 @@ namespace jobboard.Data.Repositories
                 Summary = createResumeDto.Summary,
                 References = createResumeDto.References,
                 IsHidden = false,
+                Salary = createResumeDto.Salary,
                 YearOfBirth = user.DateOfBirth,
                 UserId = userId
             };
@@ -129,16 +130,6 @@ namespace jobboard.Data.Repositories
             await _db.SaveChangesAsync();
             return resume.Id;
         }
-
-
-
-
-
-
-
-
-
-
 
         public async Task UpdateResumeAsync(Resume resume)
         {

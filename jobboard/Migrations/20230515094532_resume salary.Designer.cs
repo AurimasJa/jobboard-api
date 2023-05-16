@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using jobboard;
 
@@ -11,9 +12,11 @@ using jobboard;
 namespace jobboard.Migrations
 {
     [DbContext(typeof(JobBoardDbContext))]
-    partial class JobBoardDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230515094532_resume salary")]
+    partial class resumesalary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

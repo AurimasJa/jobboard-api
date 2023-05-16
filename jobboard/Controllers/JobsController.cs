@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+
 
 namespace jobboard.Controllers;
 
@@ -169,11 +171,16 @@ public class JobsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = Roles.Administratorius + "," + Roles.Darbdavys)]
-    public async Task<ActionResult<CreateJobCommand>> Create(CreateJobCommand createJobCommand)
+    public async Task<IActionResult> Create(CreateJobCommand createJobCommand)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
+        //if (!ModelState.IsValid)
+        //    return BadRequest(ModelState);
+        var validator = new ValidatorJob(createJobCommand);
+        var results = validator.Validate(new ValidationContext(createJobCommand));
+        if (results.Any())
+        {
+            return BadRequest(results);
+        }
         var job = new Job
         {
             Title = createJobCommand.Title,
@@ -193,7 +200,7 @@ public class JobsController : ControllerBase
             ValidityDate = DateTime.Today.Date.AddDays(30)
         };
 
-        job.IsHidden = job.ValidityDate < job.CreationDate ? true : false;
+        job.IsHidden = false;
 
         await _jobsRepository.CreateJobAsync(job);
         foreach (var requirement in createJobCommand.Requirements)
@@ -202,12 +209,13 @@ public class JobsController : ControllerBase
             await _jobsRepository.CreateJobRequirementsAsync(requirement);
         };
 
-        return Created("", new GetJobCommand(job.Id));
+        return Created("", new GetJobDto(job.Id));
     }
 
 
     [HttpPut("validity/{id}")]
-    public async Task<ActionResult<DisplayedJobDto>> UpdateJobValidity(int id, UpdateJobValidityDto updateJobValidityDto)
+    //ActionResult<DisplayedJobDto>
+    public async Task<IActionResult> UpdateJobValidity(int id, UpdateJobValidityDto updateJobValidityDto)
     {
         var oldJob = await _jobsRepository.GetJobAsync(id);
         if (oldJob == null)
@@ -242,7 +250,7 @@ public class JobsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<SuccessfulLoginDto>> UpdateJob(int id, UpdateJobDto updateJobDto)
+    public async Task<ActionResult> UpdateJob(int id, UpdateJobDto updateJobDto)
     {
         var job = await _jobsRepository.GetJobAsync(id);
         if (job == null)
@@ -301,7 +309,7 @@ public class JobsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<string>> DeleteJobAsync(int id)
+    public async Task<ActionResult> DeleteJobAsync(int id)
     {
         var job = await _jobsRepository.GetJobAsync(id);
         if (job == null)

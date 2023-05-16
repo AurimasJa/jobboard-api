@@ -37,7 +37,7 @@ public class JwtTokenService : IJwtTokenService
         (
         issuer: _issuer,
         audience: _audience,
-        expires: DateTime.UtcNow.AddHours(1), //5min REFRESH TOKEN!!!!
+        expires: DateTime.UtcNow.AddHours(1), 
         claims: authClaims,
         signingCredentials: new SigningCredentials(_authSigningKey, SecurityAlgorithms.HmacSha256)
         );

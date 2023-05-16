@@ -9,7 +9,6 @@ namespace jobboard.Data.Repositories
     {
         Task CreateJobAsync(Job job);
         Task CreateJobRequirementsAsync(Requirements requirement);
-        Task CreateJobSkillsAsync(Skills skills);
         Task DeleteJobAsync(Job job);
         Task DeleteRequirementAsync(Requirements requirement);
         Task<Job?> GetJobAsync(int jobId); 
@@ -18,7 +17,6 @@ namespace jobboard.Data.Repositories
         Task<IReadOnlyList<Job>> GetCompanyJobsAsync(string companyId);
         Task<IReadOnlyList<JobResumes>> GetJobResumesAsync(int resumeId);
         Task UpdateJobAsync(Job job);
-        Task<IReadOnlyList<Requirements>> GetJobRequirements(int jobId);
         Task<Job> GetRequirementsAsync(int jobId);
         Task<IReadOnlyList<Job?>> GetLatestJobsAsync();
         void CheckAndUpdateValidityDate();
@@ -42,10 +40,7 @@ namespace jobboard.Data.Repositories
         //{
         //    return 
         //}
-        public async Task<IReadOnlyList<Requirements?>> GetJobRequirements(int jobId)
-        {
-            return await _db.Requirements.Where(x => x.JobId == jobId).ToListAsync();
-        }
+
 
         public async Task<Job> GetRequirementsAsync(int jobId)
         {
@@ -118,11 +113,6 @@ namespace jobboard.Data.Repositories
         }
         //JobResume -> Users resume with Job.
 
-        public async Task CreateJobSkillsAsync(Skills skills)
-        {
-            _db.Skills.Add(skills);
-            await _db.SaveChangesAsync();
-        }
         public async Task UpdateJobAsync(Job job)
         {
             _db.Jobs.Update(job);

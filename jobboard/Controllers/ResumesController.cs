@@ -51,7 +51,8 @@ public class ResumesController : ControllerBase
             x.YearOfBirth,
             x.Summary,
             x.UserId,
-            x.IsHidden
+            x.IsHidden,
+            x.Salary
         ));
     }
 
@@ -82,7 +83,8 @@ public class ResumesController : ControllerBase
             x.YearOfBirth,
             x.Summary,
             x.UserId,
-            x.IsHidden
+            x.IsHidden,
+            x.Salary
         )));
     }
 
@@ -109,7 +111,8 @@ public class ResumesController : ControllerBase
             resume.YearOfBirth,
             resume.Summary,
             resume.UserId,
-            resume.IsHidden
+            resume.IsHidden,
+            resume.Salary
         );
     }
 
@@ -159,12 +162,13 @@ public class ResumesController : ControllerBase
             oldResume.YearOfBirth,
             oldResume.Summary,
             oldResume.UserId,
-            oldResume.IsHidden
+            oldResume.IsHidden,
+            oldResume.Salary
         ));
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<SuccessfulLoginDto>> UpdateResume(int id, UpdateResumeDto updateResumeDto)
+    public async Task<IActionResult> UpdateResume(int id, UpdateResumeDto updateResumeDto)
     {
         var resume = await _resumesRepository.GetResumeAsync(id);
         if (resume == null)
@@ -181,6 +185,8 @@ public class ResumesController : ControllerBase
         resume.City = string.IsNullOrEmpty(updateResumeDto.City) ? resume.City : updateResumeDto.City ?? resume.City;
         resume.Summary = string.IsNullOrEmpty(updateResumeDto.Summary) ? resume.Summary : updateResumeDto.Summary ?? resume.Summary;
         resume.Position = string.IsNullOrEmpty(updateResumeDto.Position) ? resume.Position : updateResumeDto.Position ?? resume.Position;
+        if (updateResumeDto.Salary > 0)
+            resume.Salary = (double)updateResumeDto.Salary;
 
         for (int i = 0; i < updateResumeDto.Experiences.Count && i < resume.Experience.Count; i++)
         {
