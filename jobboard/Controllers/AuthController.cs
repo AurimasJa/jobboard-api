@@ -51,7 +51,8 @@ public class AuthController : ControllerBase
             AboutSection = registerUserDto.AboutSection,
             Name = registerUserDto.Name,
             Surname = registerUserDto.Surname,
-            UserName = registerUserDto.Surname + registerUserDto.Name
+            UserName = "jobboard"
+            //registerUserDto.Surname + registerUserDto.Name
         };
         newUser.UserName = newUser.UserName + newUser.Id;
         var createUserResult = await _userManager.CreateAsync(newUser, registerUserDto.Password);

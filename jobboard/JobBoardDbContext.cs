@@ -21,6 +21,7 @@ namespace jobboard
         public DbSet<JobResumes> JobResumes { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            //optionsBuilder.UseSqlServer("Server=(LocalDb)\\MSSQLLocalDB;Database=jobboard;Trusted_Connection=True;Encrypt=False;");
 
             optionsBuilder.UseSqlServer("Server=DESKTOP-DR4U6PP\\MSSQLSERVER01;Database=jobboard;Trusted_Connection=True;Encrypt=False;");
         }
