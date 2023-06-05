@@ -36,12 +36,6 @@ namespace jobboard.Data.Repositories
             return await _db.Jobs.Include(e => e.Company).Include(e => e.Requirements).FirstOrDefaultAsync(x => x.Id == jobId);
         }
 
-        //public async Task<JobResumes> GetJobResumeAsync(int jobId, int resumeId)
-        //{
-        //    return 
-        //}
-
-
         public async Task<Job> GetRequirementsAsync(int jobId)
         {
             Job job = await _db.Jobs
@@ -111,8 +105,6 @@ namespace jobboard.Data.Repositories
                 .Where(o => o.Resume.Id == resumeId).ToListAsync();
             return local;
         }
-        //JobResume -> Users resume with Job.
-
         public async Task UpdateJobAsync(Job job)
         {
             _db.Jobs.Update(job);

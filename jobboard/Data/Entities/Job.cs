@@ -12,7 +12,7 @@ namespace jobboard.Data.Models
         public DateTime CreationDate { get; set; } //skelbimo kūrimo data
         public DateTime ValidityDate { get; set; } //skelbimo galiojimo laikas - 30d.
         public virtual List<Requirements> Requirements { get; set; }
-        public string Position { get; set; }//pareigos - advokatas, aktorius, programuotojas etc.
+        public string Position { get; set; }
         public string PositionLevel { get; set; }//pareigų lygis
         public string CompanyOffers { get; set; }//ką siūlo įmonė
         public string Location { get; set; } //vieta, kur dirbti

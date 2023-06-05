@@ -37,7 +37,7 @@ namespace JobBoardTests.Controllers
             {
                 Id = "1",
                 UserName = "user",
-                Email = "testuser@example.com",
+                Email = "test@test.com",
                 CompanyName = "test",
                 ContactPerson = "test test",
                 PhoneNumber = "123456789",
@@ -226,8 +226,8 @@ namespace JobBoardTests.Controllers
                "aprasymas",
                new List<Requirements>
         {
-            new Requirements { Name = "Requirement 1" },
-            new Requirements { Name = "Requirement 2" }
+            new Requirements { Name = "req 1" },
+            new Requirements { Name = "req 2" }
         },
                 "pozicijos sritis",
                 "pozicijos lvl",
@@ -278,8 +278,8 @@ namespace JobBoardTests.Controllers
                "aprasymas",
                new List<Requirements>
         {
-            new Requirements { Name = "Requirement 1" },
-            new Requirements { Name = "Requirement 2" }
+            new Requirements { Name = "req 1" },
+            new Requirements { Name = "req 2" }
         },
                 "pozicijos sritis",
                 "pozicijos lvl",
@@ -462,8 +462,8 @@ namespace JobBoardTests.Controllers
                 "Updated Selection",
                 new List<Requirements>
                     {
-                        new Requirements {Id = 1, Name = "Updated Requirement 1", JobId = 1 },
-                        new Requirements {Id = 1, Name = "Updated Requirement 1", JobId = 1 }
+                        new Requirements {Id = 1, Name = "Updated req 1", JobId = 1 },
+                        new Requirements {Id = 1, Name = "Updated req 1", JobId = 1 }
                     }
             );
 
@@ -537,8 +537,8 @@ namespace JobBoardTests.Controllers
                 "Updated Selection",
                 new List<Requirements>
                     {
-                        new Requirements {Id = 1, Name = "Updated Requirement 1", JobId = 1 },
-                        new Requirements {Id = 1, Name = "Updated Requirement 1", JobId = 1 }
+                        new Requirements {Id = 1, Name = "Updated req 1", JobId = 1 },
+                        new Requirements {Id = 1, Name = "Updated req 1", JobId = 1 }
                     }
             );
 
@@ -600,7 +600,6 @@ namespace JobBoardTests.Controllers
             var jobId = 5;
 
             var mockAuthService = new Mock<IAuthorizationService>();
-            //mockRepo.Setup(repo => repo.GetJobAsync(jobId)).ReturnsAsync(_jobs[0]);
             mockAuthService.Setup(service => service.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), _jobs[0], PolicyNames.CompanyOwner))
                            .ReturnsAsync(AuthorizationResult.Success);
             var controller = new JobsController(mockRepo.Object, mockUserManager.Object, null, null, mockAuthService.Object);

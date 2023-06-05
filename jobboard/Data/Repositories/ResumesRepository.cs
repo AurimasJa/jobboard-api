@@ -29,10 +29,8 @@ namespace jobboard.Data.Repositories
             _userManager = userManager;
             _db = db;
         }
-        //get resumes by job id?
         public async Task<Resume?> GetResumeAsync(int resumeId)
         {
-            //return await _db.Resumes.FirstOrDefaultAsync(x => x.Id == resumeId);
             Resume resume = await _db.Resumes
                 .Include(j => j.Experience)
                 .Include(j => j.Skills)
@@ -62,9 +60,6 @@ namespace jobboard.Data.Repositories
                 .ToListAsync();
         }
 
-
-
-        //##################
         public async Task<int> CreateResumeAsync(CreateResumeCommand createResumeDto, string userId, JobBoardUser user)
         {
             var resume = new Resume

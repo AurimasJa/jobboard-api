@@ -17,7 +17,7 @@ namespace jobboard.Helpers
 
         public List<AverageSalary> GetCityAverageSalaries(IReadOnlyList<Job> jobs)
         {
-            var avg = jobs.GroupBy(j => j.City)
+            var avg = jobs.Where(j => !j.IsHidden).GroupBy(j => j.City)
                                    .Select(x => new AverageSalary { CityName = x.Key, AverageCitySalary = x.Average(j => j.Salary) })
                                        .Take(10)
                                    .ToList();
